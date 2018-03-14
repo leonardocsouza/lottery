@@ -89,4 +89,31 @@ describe('Lottery Contract', () => {
       assert(!(err instanceof assert.AssertionError));
     }
   });
+
+  it('only manager can call pickWinner', async () => {
+    // enter non-manager account into lottery
+    // we need this, becaues otherwise even calling
+    // pickWinner with the manager would fail
+    // and we want to be sure the test fails only
+    // when trying to call pickWinner with a non-manager
+    await lottery.methods.enter().send({
+      from: accounts[1],
+      value: web3.utils.toWei('0.02', 'ether')
+    });
+
+    try {
+      await lottery.methods.pickWinner().send({
+        from: accounts[1]
+      });
+      // it should have failed before getting to here
+      assert(false);
+    } catch (err) {
+      // check that we have an error
+      assert(err);
+
+      // check that error isn't the "forced" AssertionError
+      // caused by assert(false)
+      assert(!(err instanceof assert.AssertionError));
+    }
+  });
 });
