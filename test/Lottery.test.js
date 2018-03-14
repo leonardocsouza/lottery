@@ -71,4 +71,22 @@ describe('Lottery Contract', () => {
     assert.equal(accounts[2], players[2]);
     assert.equal(3, players.length);
   });
+
+  it('requires a minimum amount of ether to enter', async () => {
+    try {
+      await lottery.methods.enter().send({
+        from: accounts[0],
+        value: web3.utils.toWei('0.01', 'ether')
+      });
+      // it should have failed before getting to here
+      assert(false);
+    } catch (err) {
+      // check that we have an error
+      assert(err);
+
+      // check that error isn't the "forced" AssertionError
+      // caused by assert(false)
+      assert(!(err instanceof assert.AssertionError));
+    }
+  });
 });
